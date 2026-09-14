@@ -45,9 +45,21 @@ rows() {
   psql "$DSNS" -tAc "$2" 2>/dev/null | tr -d '[:space:]'
 }
 
+# table_exists <schema.table>：旧表在本轮切流后由 ./deploy.sh retire 删除属于预期，
+# 这种情况报「已退役」而不是「读不到行数」，避免把正常状态显示成故障。
+table_exists() {
+  local got
+  got="$(psql "$DSNS" -tAc "SELECT to_regclass('$1') IS NOT NULL" 2>/dev/null)"
+  [[ "$got" == "t" ]]
+}
+
 compare_rows() {
   local label="$1" old_sql="$2" new_sql="$3"
+  local old_table="${4:-}"
   local a b
+  if [[ -n "$old_table" ]] && ! table_exists "$old_table"; then
+    na "$label 旧表 $old_table 已退役（retire 之后的预期状态，无需对比）"; return
+  fi
   a="$(rows "$label" "$old_sql")"; b="$(rows "$label" "$new_sql")"
   if [[ -z "$a" || -z "$b" ]]; then na "$label 无法读取行数（检查 DSNS 与表是否存在）"; return; fi
   if [[ "$a" == "$b" ]]; then ok "$label 行数一致（旧 $a / 新 $b）"; else bad "$label 行数不一致（旧 $a / 新 $b，差 $((b-a))）"; fi
@@ -73,11 +85,11 @@ fi
 
 if [[ -n "$DSNS" ]]; then
   echo "== 3. 新旧表行数对比（切换瞬间应完全一致） =="
-  compare_rows "topics"    "SELECT count(*) FROM modules.forum_topics" "SELECT count(*) FROM community.topics"
-  compare_rows "posts"     "SELECT count(*) FROM modules.forum_posts"  "SELECT count(*) FROM community.posts"
-  compare_rows "boards"    "SELECT count(*) FROM modules.forum_boards" "SELECT count(*) FROM community.boards"
-  compare_rows "records"   "SELECT count(*) FROM modules.records"      "SELECT count(*) FROM community.records"
-  compare_rows "favorites" "SELECT count(*) FROM catalog.favorites"    "SELECT count(*) FROM community.favorites"
+  compare_rows "topics"    "SELECT count(*) FROM modules.forum_topics" "SELECT count(*) FROM community.topics"    "modules.forum_topics"
+  compare_rows "posts"     "SELECT count(*) FROM modules.forum_posts"  "SELECT count(*) FROM community.posts"     "modules.forum_posts"
+  compare_rows "boards"    "SELECT count(*) FROM modules.forum_boards" "SELECT count(*) FROM community.boards"    "modules.forum_boards"
+  compare_rows "records"   "SELECT count(*) FROM modules.records"      "SELECT count(*) FROM community.records"   "modules.records"
+  compare_rows "favorites" "SELECT count(*) FROM catalog.favorites"    "SELECT count(*) FROM community.favorites" "catalog.favorites"
 else
   echo "== 3. 表行数对比 =="
   na "未设置 DSNS：跳过行数对比"
