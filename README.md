@@ -12,8 +12,8 @@ MetaFusion 微服务生态的统一边缘网关：按前缀分流、限流、安
 | 前缀 | 当前指向 | 目标上游 | 状态 |
 |---|---|---|---|
 | `/api/catalog/*` | catalog:8080（主仓库） | catalog:8080 | ✅ 已在目标形态 |
-| `/api/auth/*`、`/api/setup`、`/api/admin/users*`、`/api/oauth/*`、`/api/oidc/*`、`/api/.well-known/*` | catalog:8080 | auth:8081 | ⏳ 等 metafusion-auth 实现并验收（P3） |
-| `/.well-known/*`（根路径 discovery） | auth:8081 | auth:8081 | ⏸ auth 上线后启用；当前 issuer 在 `/api` 下 |
+| `/api/auth/*`、`/api/setup`、`/api/admin/users*`、`/api/oauth/*`、`/api/oidc/*`、`/api/.well-known/*` | catalog:8080 | auth:8081 | ⏳ 服务已实现（P3 完成），部署后把 6 处上游改成 `http://auth:8081` 即可 |
+| `/.well-known/*`（根路径 discovery） | auth:8081 | auth:8081 | ⏳ auth 服务已实现并支持该路径；部署 auth 后才可用（未部署时会 502） |
 | `/api/community/*`、`/api/records/*` | catalog:8080 | community:8083 | ⏳ 服务已实现（P2 完成），切流改成 `http://community:8083` 即可 |
 | `/api/favorites/*`、`/api/users/{id}/favorites` | catalog:8080 | community:8083 | ⏳ 收藏仍在目录库（`catalog.favorites`），随账号拆分（P3）一起迁 |
 | `/api/storage/*` | storage:8082 | storage:8082 | ✅ 契约已实现；等前端接入后对外启用（P1） |
