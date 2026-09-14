@@ -14,7 +14,8 @@ MetaFusion 微服务生态的统一边缘网关：按前缀分流、限流、安
 | `/api/catalog/*` | catalog:8080（主仓库） | catalog:8080 | ✅ 已在目标形态 |
 | `/api/auth/*`、`/api/setup`、`/api/admin/users*`、`/api/oauth/*`、`/api/oidc/*`、`/api/.well-known/*` | catalog:8080 | auth:8081 | ⏳ 等 metafusion-auth 实现并验收（P3） |
 | `/.well-known/*`（根路径 discovery） | auth:8081 | auth:8081 | ⏸ auth 上线后启用；当前 issuer 在 `/api` 下 |
-| `/api/community/*`、`/api/favorites/*`、`/api/records/*`、`/api/users/{id}/favorites` | catalog:8080 | community:8083 | ⏳ 等 metafusion-community 迁移（P2） |
+| `/api/community/*`、`/api/records/*` | catalog:8080 | community:8083 | ⏳ 服务已实现（P2 完成），切流改成 `http://community:8083` 即可 |
+| `/api/favorites/*`、`/api/users/{id}/favorites` | catalog:8080 | community:8083 | ⏳ 收藏仍在目录库（`catalog.favorites`），随账号拆分（P3）一起迁 |
 | `/api/storage/*` | storage:8082 | storage:8082 | ✅ 契约已实现；等前端接入后对外启用（P1） |
 | `/api/archive/*`、`/api/playback/*`、`/api/media/*` | catalog:8080 | storage:8082（退役旧前缀） | ⏳ P4 切流后下线 |
 | `/api/*`（其余） | catalog:8080 | catalog:8080 | ✅ |
