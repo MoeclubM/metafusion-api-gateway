@@ -1,0 +1,28 @@
+# 本仓库不再持有生效的网关矩阵（唯一来源是主仓库 deploy/nginx.conf），残留的切流前矩阵已移入
+# examples/pre-cutover/ 并标注“不参与部署”。这里只守两件事：脚本语法，以及断言表的自检（不联网、不打线上）。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  scripts:
+    name: cutover-check (syntax & self-check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: bash -n
+        run: bash -n scripts/cutover-check.sh
+      - name: self-check（不联网）
+        # 断言表里不允许出现空标记/占位符，URL 必须是 http(s)，状态码式必须以 ^ 开头。
+        run: ./scripts/cutover-check.sh --self-check
