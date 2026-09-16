@@ -25,4 +25,5 @@ jobs:
         run: bash -n scripts/cutover-check.sh
       - name: self-check（不联网）
         # 断言表里不允许出现空标记/占位符，URL 必须是 http(s)，状态码式必须以 ^ 开头。
-        run: ./scripts/cutover-check.sh --self-check
+        # 用 bash 显式解释：仓库里这个文件没有可执行位（首次 CI 直接 ./ 跑是 126 Permission denied）。
+        run: bash scripts/cutover-check.sh --self-check
