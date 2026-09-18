@@ -37,6 +37,9 @@ DSNS='postgres://user:pass@host:5432/db?sslmode=disable' ./scripts/cutover-check
 而"前缀又指回目录服务"同样返回 200，看不出事故。现在每条断言都必须写明期望的标记值，
 `--self-check` 会拦下空标记与 `-`。
 
+判定口径补充（行数对比，`DSNS` 分支）：**设了 `DSNS` 就没有静默跳过**——行数读不到、表存在性读不到、
+本机没有 `psql`，一律 FAIL 并退出 1；只有“旧表已由 `deploy.sh retire` 删除”才报 SKIP，且写明原因。
+SKIP 不等于通过，汇总行会把它单独计数。
 ## 改路由归属时的顺序
 
 1. 改主仓库 `deploy/nginx.conf`（每个前缀一行 `set $x_upstream`，切流/回滚只改这一行）；
