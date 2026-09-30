@@ -47,7 +47,6 @@ SKIP 不等于通过，汇总行会把它单独计数。
 3. 在主仓库跑 `python scripts/check_gateway_matrix.py`（不一致即 FAIL，含"文档归给谁、矩阵指向谁"的比对）；
 4. 部署后用本仓库的 `GATEWAY=<host> ./scripts/cutover-check.sh` 逐前缀复核标记。
 
-`/api/users/{id}/favorites` 与用户资料同前缀，因此网关用精确正则 `^/api/users/[^/]+/favorites$` 单独分流，
-其余 `/api/users/*` 仍归目录服务——这类"同前缀不同归属"的规则只在主仓库矩阵里有唯一一份。
+`/api/users/*` 是同前缀多归属：`/{id}` 归账号服务，`/{id}/favorites` 与 `/{id}/stats` 归互动服务，`/{id}/contributions` 归目录服务。前三项用各自锚定的正则从目录兜底中分流；规则只在主仓库矩阵里有一份生效来源。
 
 > 本仓库只做网关与切流自检，不承载业务；聚合各服务 OpenAPI 是后续目标，当前 `/api/openapi.json` 由 catalog 提供。
