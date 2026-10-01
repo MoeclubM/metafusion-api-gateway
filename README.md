@@ -3,16 +3,13 @@
 > **本仓库不再持有生效的路由矩阵。** 唯一生效的矩阵在主仓库 MetaFusion 的 `deploy/nginx.conf`
 > （compose 的 `gateway` 服务把它挂进容器），归属表在 `docs/architecture/service-split-migration.md` §2，
 > 两者的一致性由主仓库的 `scripts/check_gateway_matrix.py` 强制。
-> 本仓库此前那份 `nginx.conf` 是切流前（P0–P3）的迁移期矩阵，账号/互动/OAuth 前缀当时仍指向单体
-> `catalog:8080`（而线上服务名是 `backend`，根本没有 `catalog` 这个服务），照它部署会把账号前缀打回目录。
-> 它现在放在 `examples/pre-cutover/`，只作历史追溯，**不要挂进任何容器**。
+> 旧切流矩阵与反代样例已移除，历史可从 Git 查询；本仓不提供第二份可挂载配置。
 
 ## 仓库里现在有什么
 
 | 路径 | 作用 |
 | --- | --- |
 | `scripts/cutover-check.sh` | 切流/回滚自检：逐服务健康 + 逐前缀分流核对（判据是每个服务的 `X-MetaFusion-Service` 响应头） |
-| `examples/pre-cutover/` | 切流前的矩阵与共用反代头样例，**不参与部署** |
 
 原先的 `Dockerfile` 与 `docker-compose.yml` 已删除：它们会把上面那份过期矩阵打进镜像，
 让"哪份矩阵在跑"重新变得不确定。需要网关镜像时用主仓库编排里的 `gateway` 服务（`nginx:1.25-alpine` + 挂载矩阵）。
