@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # MetaFusion 切流自检：确认各服务自身健康、网关把每个前缀切到了预期的上游。
-# 对应主仓库 docs/architecture/cutover-runbook.md 的“验证”列，可整段照抄执行。
+# 对应主仓库 docs/architecture/deployment-runbook.md 的验收步骤，可整段照抄执行。
 #
 # 用法：
 #   ./scripts/cutover-check.sh --self-check                    # 只校验本脚本的断言表（不联网，CI 用）
